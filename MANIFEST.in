@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include super_distribution *.css
+recursive-include super_distribution *.csv
+recursive-include super_distribution *.html
+recursive-include super_distribution *.ico
+recursive-include super_distribution *.js
+recursive-include super_distribution *.json
+recursive-include super_distribution *.md
+recursive-include super_distribution *.png
+recursive-include super_distribution *.py
+recursive-include super_distribution *.svg
+recursive-include super_distribution *.txt
+recursive-exclude super_distribution *.pyc
