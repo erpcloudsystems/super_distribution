@@ -63,42 +63,42 @@ def before_validate(doc, method=None):
 @frappe.whitelist()
 def validate(doc, method=None):
 
-    if doc.custom_mobile == 1 and doc.get("items"):
-        for item in doc.items:
-            item_code = item.get("item_code")
-            if not item_code:
-                continue
+    # if doc.custom_mobile == 1 and doc.get("items"):
+    #     for item in doc.items:
+    #         item_code = item.get("item_code")
+    #         if not item_code:
+    #             continue
 
-            # Fetch Pricing Rule names linked to this item_code via Pricing Rule Item Code child table
-            pricing_rule_names = frappe.db.get_all(
-                "Pricing Rule Item Code",
-                filters={"item_code": item_code},
-                fields=["parent"]
-            )
-            # Extract just the parent names (Pricing Rule names)
-            pricing_rule_names = [row.parent for row in pricing_rule_names]
+    #         # Fetch Pricing Rule names linked to this item_code via Pricing Rule Item Code child table
+    #         pricing_rule_names = frappe.db.get_all(
+    #             "Pricing Rule Item Code",
+    #             filters={"item_code": item_code},
+    #             fields=["parent"]
+    #         )
+    #         # Extract just the parent names (Pricing Rule names)
+    #         pricing_rule_names = [row.parent for row in pricing_rule_names]
 
-            # Optionally filter pricing rules that are enabled and selling=1
-            if pricing_rule_names:
-                valid_pricing_rules = frappe.db.get_all(
-                    "Pricing Rule",
-                    filters={
-                        "name": ["in", pricing_rule_names],
-                        # "enabled": 1,
-                        "selling": 1
-                    },
-                    pluck="name"
-                )
-            else:
-                valid_pricing_rules = []
+    #         # Optionally filter pricing rules that are enabled and selling=1
+    #         if pricing_rule_names:
+    #             valid_pricing_rules = frappe.db.get_all(
+    #                 "Pricing Rule",
+    #                 filters={
+    #                     "name": ["in", pricing_rule_names],
+    #                     # "enabled": 1,
+    #                     "selling": 1
+    #                 },
+    #                 pluck="name"
+    #             )
+    #         else:
+    #             valid_pricing_rules = []
 
-            args = {
-                "pricing_rules": valid_pricing_rules,  # List of applicable Pricing Rule names for this item
-                "price_list_rate": item.price_list_rate,
-                "price_or_product_discount": "Price",
-            }
-            apply_pricing_rule_on_items(doc, item, args)
-            set_pricing_rule_details(doc, item, args) 
+    #         args = {
+    #             "pricing_rules": valid_pricing_rules,  # List of applicable Pricing Rule names for this item
+    #             "price_list_rate": item.price_list_rate,
+    #             "price_or_product_discount": "Price",
+    #         }
+    #         apply_pricing_rule_on_items(doc, item, args)
+    #         set_pricing_rule_details(doc, item, args) 
     calculate_additional_discount(doc)
 
 @frappe.whitelist()
