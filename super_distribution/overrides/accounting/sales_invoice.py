@@ -12,8 +12,7 @@ from erpnext.accounts.doctype.pricing_rule.utils import (
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import SalesInvoice
 
 class CustomSalesInvoice(SalesInvoice):
-    def apply_pricing_rule_on_items(self, item, pricing_rule_args):
-        
+    def apply_pricing_rule_on_items(self, item, pricing_rule_args): 
         if not item.get('price_list_rate'):
             return
 
@@ -57,25 +56,25 @@ class CustomSalesInvoice(SalesInvoice):
             # Calculate the amount and percentage discount for applicable pricing rule
             if price_rule_detail.get('type') == 'Default':
                 if price_rule_detail.get('rate_or_discount') == 'Discount Percentage':
-                    total_discount_percentage += price_rule_detail.get('discount_percentage', 0)
+                    total_discount_percentage += price_rule_detail.get('discount_percentage', 0.0)
                 else:
-                    total_discount_amount += price_rule_detail.get('discount_amount', 0)
+                    total_discount_amount += price_rule_detail.get('discount_amount', 0.0)
             if price_rule_detail.get('type') == 'Shipping' and item.item_code in shipping_dict:
                 if price_rule_detail.get('rate_or_discount') == 'Discount Percentage':
-                    total_discount_percentage += price_rule_detail.get('discount_percentage', 0)
+                    total_discount_percentage += price_rule_detail.get('discount_percentage', 0.0)
                 else:
-                    total_discount_amount += price_rule_detail.get('discount_amount', 0)
+                    total_discount_amount += price_rule_detail.get('discount_amount', 0.0)
             if price_rule_detail.get('type') == 'Cash' and item.item_code in cash_dict:
                 if price_rule_detail.get('rate_or_discount') == 'Discount Percentage':
-                    total_discount_percentage += price_rule_detail.get('discount_percentage', 0)
+                    total_discount_percentage += price_rule_detail.get('discount_percentage', 0.0)
                 else:
-                    total_discount_amount += price_rule_detail.get('discount_amount', 0)
+                    total_discount_amount += price_rule_detail.get('discount_amount', 0.0)
         
         # Set The New discount_percentage and discount_amount for this Item 
         price_list_rate = item.get('price_list_rate')
-        pricing_rule_args['discount_percentage'] = total_discount_percentage + (total_discount_amount / price_list_rate * 100)
-        pricing_rule_args['discount_amount'] =  total_discount_amount + (total_discount_percentage * price_list_rate / 100)
-                
+        pricing_rule_args['discount_percentage'] = total_discount_percentage # + (total_discount_amount / price_list_rate * 100)
+        pricing_rule_args['discount_amount'] =  total_discount_amount # + (total_discount_percentage * price_list_rate / 100)       
+        
         if not pricing_rule_args.get("validate_applied_rule", 0):
             # if user changed the discount percentage then set user's discount percentage ?
             if pricing_rule_args.get("price_or_product_discount") == "Price":

@@ -72,8 +72,8 @@ class CustomDeliveryNote(DeliveryNote):
         
         # Set The New discount_percentage and discount_amount for this Item 
         price_list_rate = item.get('price_list_rate')
-        pricing_rule_args['discount_percentage'] = total_discount_percentage + (total_discount_amount / price_list_rate * 100)
-        pricing_rule_args['discount_amount'] =  total_discount_amount + (total_discount_percentage * price_list_rate / 100)
+        pricing_rule_args['discount_percentage'] = total_discount_percentage # + (total_discount_amount / price_list_rate * 100)
+        pricing_rule_args['discount_amount'] =  total_discount_amount # + (total_discount_percentage * price_list_rate / 100)
                 
         if not pricing_rule_args.get("validate_applied_rule", 0):
             # if user changed the discount percentage then set user's discount percentage ?
