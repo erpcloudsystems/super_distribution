@@ -24,15 +24,15 @@ frappe.ui.form.on("Sales Order", {
 frappe.ui.form.on("Sales Order Item", {
 	"rate": function (frm, cdt, cdn) {
 		set_discount(frm, cdt, cdn);
-		set_total_discount(frm);
+		// set_total_discount(frm);
 	},
 	"qty": function (frm, cdt, cdn) {
 		set_discount(frm, cdt, cdn);
-		set_total_discount(frm);
+		// set_total_discount(frm);
 	},
 	"shipping_discount": function (frm, cdt, cdn) {
 		set_discount(frm, cdt, cdn);
-		set_total_discount(frm);
+		// set_total_discount(frm);
 	}
 });
 

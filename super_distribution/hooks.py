@@ -30,13 +30,16 @@ app_license = "MIT"
 
 # include js in doctype views
 doctype_js = {
-    "Sales Order" : "public/js/sales_order.js",
-    "Sales Invoice": "public/js/sales_invoice.js",
+    # "Sales Order" : "public/js/sales_order.js",
+    # "Sales Invoice": "public/js/sales_invoice.js",
+	"Sales Order" : "doctype_triggers/selling/sales_order/sales_order.js",
+    "Sales Invoice" : "doctype_triggers/accounting/sales_invoice/sales_invoice.js",
+	"Delivery Note" : "doctype_triggers/stock/delivery_note/delivery_note.js",
     "Sales Person": "public/js/sales_person.js",
     "Customer": "public/js/customer.js",
     "Purchase Invoice": "public/js/purchase_invoice.js",
     "Purchase Order": "public/js/purchase_order.js"
-    }
+}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -101,21 +104,57 @@ doctype_js = {
 # ---------------
 # Override standard doctype classes
 
-# override_doctype_class = {
-#	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+	"Sales Order": "super_distribution.overrides.selling.sales_order.CustomSalesOrder",
+	"Sales Invoice": "super_distribution.overrides.accounting.sales_invoice.CustomSalesInvoice",
+	"Delivery Note": "super_distribution.overrides.stock.delivery_note.CustomDeliveryNote",
+}
 
 # Document Events
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-#	"*": {
-#		"on_update": "method",
-#		"on_cancel": "method",
-#		"on_trash": "method"
-#	}
-# }
+doc_events = {
+	"Sales Order": {
+		"before_insert": "super_distribution.doctype_triggers.selling.sales_order.sales_order.before_insert",
+		"after_insert": "super_distribution.doctype_triggers.selling.sales_order.sales_order.after_insert",
+		"onload": "super_distribution.doctype_triggers.selling.sales_order.sales_order.onload",
+		"before_validate": "super_distribution.doctype_triggers.selling.sales_order.sales_order.before_validate",
+		"validate": "super_distribution.doctype_triggers.selling.sales_order.sales_order.validate",
+		"on_submit": "super_distribution.doctype_triggers.selling.sales_order.sales_order.on_submit",
+		"on_cancel": "super_distribution.doctype_triggers.selling.sales_order.sales_order.on_cancel",
+		"on_update_after_submit": "super_distribution.doctype_triggers.selling.sales_order.sales_order.on_update_after_submit",
+		"before_save": "super_distribution.doctype_triggers.selling.sales_order.sales_order.before_save",
+		"before_cancel": "super_distribution.doctype_triggers.selling.sales_order.sales_order.before_cancel",
+		"on_update": "super_distribution.doctype_triggers.selling.sales_order.sales_order.on_update",
+	},
+	"Sales Invoice": {
+		"before_insert": "super_distribution.doctype_triggers.accounting.sales_invoice.sales_invoice.before_insert",
+		"after_insert": "super_distribution.doctype_triggers.accounting.sales_invoice.sales_invoice.after_insert",
+		"onload": "super_distribution.doctype_triggers.accounting.sales_invoice.sales_invoice.onload",
+		"before_validate": "super_distribution.doctype_triggers.accounting.sales_invoice.sales_invoice.before_validate",
+		"validate": "super_distribution.doctype_triggers.accounting.sales_invoice.sales_invoice.validate",
+		"on_submit": "super_distribution.doctype_triggers.accounting.sales_invoice.sales_invoice.on_submit",
+		"on_cancel": "super_distribution.doctype_triggers.accounting.sales_invoice.sales_invoice.on_cancel",
+		"on_update_after_submit": "super_distribution.doctype_triggers.accounting.sales_invoice.sales_invoice.on_update_after_submit",
+		"before_save": "super_distribution.doctype_triggers.accounting.sales_invoice.sales_invoice.before_save",
+		"before_cancel": "super_distribution.doctype_triggers.accounting.sales_invoice.sales_invoice.before_cancel",
+		"on_update": "super_distribution.doctype_triggers.accounting.sales_invoice.sales_invoice.on_update",
+	},
+	"Delivery Note": {
+		"before_insert": "super_distribution.doctype_triggers.stock.delivery_note.delivery_note.before_insert",
+		"after_insert": "super_distribution.doctype_triggers.stock.delivery_note.delivery_note.after_insert",
+		"onload": "super_distribution.doctype_triggers.stock.delivery_note.delivery_note.onload",
+		"before_validate": "super_distribution.doctype_triggers.stock.delivery_note.delivery_note.before_validate",
+		"validate": "super_distribution.doctype_triggers.stock.delivery_note.delivery_note.validate",
+		"on_submit": "super_distribution.doctype_triggers.stock.delivery_note.delivery_note.on_submit",
+		"on_cancel": "super_distribution.doctype_triggers.stock.delivery_note.delivery_note.on_cancel",
+		"on_update_after_submit": "super_distribution.doctype_triggers.stock.delivery_note.delivery_note.on_update_after_submit",
+		"before_save": "super_distribution.doctype_triggers.stock.delivery_note.delivery_note.before_save",
+		"before_cancel": "super_distribution.doctype_triggers.stock.delivery_note.delivery_note.before_cancel",
+		"on_update": "super_distribution.doctype_triggers.stock.delivery_note.delivery_note.on_update",
+	},
+}
 
 # Scheduled Tasks
 # ---------------
