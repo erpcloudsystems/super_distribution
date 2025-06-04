@@ -51,3 +51,25 @@ function apply_shipping_discount_to_all_items(frm) {
     });
     frm.refresh_field('items');
 }
+
+frappe.ui.form.on('Sales Invoice Item', {
+    rate: function(frm, cdt, cdn) {
+        let item = locals[cdt][cdn];
+        if (frm.doc.ignore_pricing_rule && item.price_list_rate > 0) {
+            let discount = ((item.price_list_rate - item.rate) / item.price_list_rate) * 100;
+            frappe.model.set_value(cdt, cdn, "discount_percentage", discount);
+        }
+    }
+});
+
+frappe.ui.form.on('Sales Invoice', {
+    before_save: function(frm) {
+        frm.doc.items.forEach(item => {
+            if (frm.doc.ignore_pricing_rule && item.price_list_rate && item.rate !== item.price_list_rate) {
+                let discount = ((item.price_list_rate - item.rate) / item.price_list_rate) * 100;
+                item.discount_percentage = discount;
+            }
+        });
+        frm.refresh_field("items");
+    }
+});

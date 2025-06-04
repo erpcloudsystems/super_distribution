@@ -42,6 +42,18 @@ import frappe
 from frappe.utils import flt
 
 def calculate_additional_discount(doc):
+    for row in doc.items:
+        price_list_rate = row.get('price_list_rate', 0) or 0
+        rate = row.get('rate', 0) or 0
+        if rate < price_list_rate and price_list_rate > 0:
+            row.custom_discount__on_price_list_rate_with_margin = (((price_list_rate - rate) / price_list_rate) * 100) - (row.get('custom_shipping_', 0) or 0) - (row.get('custom_cash_', 0) or 0)
+            row.discount_percentage = ((price_list_rate - rate) / price_list_rate) * 100
+            row.custom_discount_amount = (price_list_rate - rate)  - (row.get('custom_shipping_discount', 0) or 0) - (row.get('custom_cash_discount', 0) or 0)
+            row.discount_amount = price_list_rate - rate
+            
+    if doc.ignore_pricing_rule:
+        return
+        
     # Reset discounts
     for row in doc.items:
         row.custom_discount__on_price_list_rate_with_margin = 0
@@ -138,12 +150,12 @@ def calculate_additional_discount(doc):
         row.discount_amount = row.custom_shipping_discount + row.custom_cash_discount + row.custom_discount_amount
         row.discount_percentage = row.custom_shipping_ + row.custom_cash_ + row.custom_discount__on_price_list_rate_with_margin
 
-        row.rate = base_amount - row.discount_amount
-        row.net_rate = row.rate
-        row.base_net_rate = row.rate
-        row.base_rate = row.rate
+        # row.rate = base_amount - row.discount_amount
+        # row.net_rate = row.rate
+        # row.base_net_rate = row.rate
+        # row.base_rate = row.rate
 
-        row.amount = row.rate * qty
-        row.base_amount = row.amount
-        row.net_amount = row.amount
-        row.base_net_amount = row.amount
+        # row.amount = row.rate * qty
+        # row.base_amount = row.amount
+        # row.net_amount = row.amount
+        # row.base_net_amount = row.amount

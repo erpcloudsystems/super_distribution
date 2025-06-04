@@ -80,6 +80,18 @@ def on_update(doc, method=None):
     pass
 
 def calculate_additional_discount(doc):
+    for row in doc.items:
+        price_list_rate = row.get('price_list_rate', 0) or 0
+        rate = row.get('rate', 0) or 0
+        if rate < price_list_rate and price_list_rate > 0:
+            row.custom_discount__on_price_list_rate_with_margin = (((price_list_rate - rate) / price_list_rate) * 100) - (row.get('custom_shipping_', 0) or 0) - (row.get('custom_cash_', 0) or 0)
+            row.discount_percentage = ((price_list_rate - rate) / price_list_rate) * 100
+            row.custom_discount_amount = (price_list_rate - rate)  - (row.get('custom_shipping_discount', 0) or 0) - (row.get('custom_cash_discount', 0) or 0)
+            row.discount_amount = price_list_rate - rate
+            
+    if doc.ignore_pricing_rule:
+        return
+        
     pricing_rule_names = [row.pricing_rule for row in doc.pricing_rules if row.pricing_rule]
 
     for row in doc.items:
@@ -178,20 +190,17 @@ def calculate_additional_discount(doc):
         row.discount_amount = row.custom_shipping_discount + row.custom_cash_discount + row.custom_discount_amount
         row.discount_percentage = row.custom_shipping_ + row.custom_cash_ + row.custom_discount__on_price_list_rate_with_margin
 
-        row.rate = (row.price_list_rate or 0) - (row.discount_amount or 0)
-        row.net_rate = row.rate
-        row.base_net_rate = row.rate
-        row.base_rate = row.rate
-        row.custom_rate_after_tax = row.rate + (row.get('custom_tax_amount', 0) /  row.get('qty', 1)) + (row.get('custom_tax_amount_14_', 0) /  row.get('qty', 1))
+        # row.rate = (row.price_list_rate or 0) - (row.discount_amount or 0)
+        # row.net_rate = row.rate
+        # row.base_net_rate = row.rate
+        # row.base_rate = row.rate
+        row.custom_rate_after_tax = row.get('rate', 0) + (row.get('custom_tax_amount', 0) /  row.get('qty', 1)) + (row.get('custom_tax_amount_14_', 0) /  row.get('qty', 1))
 
-        row.amount = row.rate * (row.get('qty', 0))
-        row.base_amount = row.amount
-        row.net_amount = row.amount
-        row.base_net_amount = row.amount
+        # row.amount = row.rate * (row.get('qty', 0))
+        # row.base_amount = row.amount
+        # row.net_amount = row.amount
+        # row.base_net_amount = row.amount
         row.custom_amount_after_tax = row.custom_rate_after_tax * row.get('qty', 0)
-
-
-
 
 
 def apply_pricing_rule_on_items(self, item, pricing_rule_args):
