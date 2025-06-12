@@ -241,12 +241,15 @@ def calculate_additional_discount(doc):
         # row.net_rate = row.rate
         # row.base_net_rate = row.rate
         # row.base_rate = row.rate
+        row.item_tax_ = (row.get('custom_tax_amount', 0)) + (row.get('custom_tax_amount_14_', 0))
         row.custom_rate_after_tax = row.get('rate', 0) + (row.get('custom_tax_amount', 0) /  row.get('qty', 1)) + (row.get('custom_tax_amount_14_', 0) /  row.get('qty', 1))
         
+
         # row.amount = row.rate * (row.get('qty', 0))
         # row.base_amount = row.amount
         # row.net_amount = row.amount
         # row.base_net_amount = row.amount
+        row.custom_item_tax_for_unit = (row.get('custom_tax_amount', 0) /  row.get('qty', 1)) + (row.get('custom_tax_amount_14_', 0) /  row.get('qty', 1))
         row.custom_amount_after_tax = row.custom_rate_after_tax * row.get('qty', 0)
 
 
