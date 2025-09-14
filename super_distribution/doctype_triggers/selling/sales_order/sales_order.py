@@ -18,10 +18,22 @@ def onload(doc, method=None):
     pass
 @frappe.whitelist()
 def before_validate(doc, method=None):
-   pass
+    pass
     # calculate_additional_discount(doc)
 @frappe.whitelist()
 def validate(doc, method=None):
+    custom_total_amount = 0.0
+    for row in doc.items:
+        price_list_rate = row.get('price_list_rate') or 0.0
+        qty = row.get('qty') or 0.0
+        custom_total_amount += price_list_rate * qty
+        
+    doc.custom_total_amount = custom_total_amount
+    
+    total = 0
+    for row in doc.items:
+        total += (row.get('discount_amount', 0) * row.get('qty', 0)) # Correct accumulation
+    doc.custom_total_discount = total
     # if doc.custom_mobile == 1 and doc.get("items"):
     #     for item in doc.items:
     #         item_code = item.get("item_code")
@@ -58,6 +70,8 @@ def validate(doc, method=None):
     #         }
     #         apply_pricing_rule_on_items(doc, item, args)
     #         set_pricing_rule_details(doc, item, args)
+    calculate_tax_per_unit(doc)
+    
     calculate_additional_discount(doc)
 
 @frappe.whitelist()
@@ -194,14 +208,51 @@ def calculate_additional_discount(doc):
         # row.net_rate = row.rate
         # row.base_net_rate = row.rate
         # row.base_rate = row.rate
-        row.custom_rate_after_tax = row.get('rate', 0) + (row.get('custom_tax_amount', 0) /  row.get('qty', 1)) + (row.get('custom_tax_amount_14_', 0) /  row.get('qty', 1))
+        # row.custom_rate_after_tax = row.get('rate', 0) + (row.get('custom_tax_amount', 0) /  row.get('qty', 1)) + (row.get('custom_tax_amount_14_', 0) /  row.get('qty', 1))
 
         # row.amount = row.rate * (row.get('qty', 0))
         # row.base_amount = row.amount
         # row.net_amount = row.amount
         # row.base_net_amount = row.amount
+        # row.custom_amount_after_tax = row.custom_rate_after_tax * row.get('qty', 0)
+        
+        custom_tax_amount = row.get('custom_tax_amount') or 0.0
+        custom_tax_amount_14_ = row.get('custom_tax_amount_14_') or 0.0
+        
+        row.custom_item_tax_ = custom_tax_amount + custom_tax_amount_14_
+        row.custom_rate_after_tax = row.get('rate', 0) + (custom_tax_amount /  row.get('qty', 1)) + (custom_tax_amount_14_ /  row.get('qty', 1))
+        
+
+        # row.amount = row.rate * (row.get('qty', 0))
+        # row.base_amount = row.amount
+        # row.net_amount = row.amount
+        # row.base_net_amount = row.amount
+        row.custom_item_tax_for_unit = (custom_tax_amount /  row.get('qty', 1)) + (custom_tax_amount_14_ /  row.get('qty', 1))
         row.custom_amount_after_tax = row.custom_rate_after_tax * row.get('qty', 0)
 
+def calaculate_item_taxes(template,amount,qty):
+    total_tax_per_unit = 0.0
+    tax_rates = frappe.get_all("Item Tax Template Detail", {"parent":template}, pluck = "tax_rate")
+    for rate in tax_rates:
+        tax_amount = ( (amount * rate) / 100 ) / qty
+        total_tax_per_unit += tax_amount
+    return total_tax_per_unit
+    
+def calculate_tax_per_unit(doc):
+    if doc.items:
+        for row in doc.items:  
+            if not row.custom_consumer_rate:
+                row.custom_item_tax_for_unit = calaculate_item_taxes(row.item_tax_template,row.amount,row.qty)
+            else:
+                custom_tax_amount = row.get('custom_tax_amount') or 0.0
+                custom_tax_amount_14_ = row.get('custom_tax_amount_14_') or 0.0
+                
+                custom_item_tax_for_unit = (custom_tax_amount /  row.get('qty', 1)) + (custom_tax_amount_14_ /  row.get('qty', 1))
+        
+                row.custom_item_tax_for_unit = custom_item_tax_for_unit
+                
+            row.custom_rate_after_tax = row.get('rate', 0) + row.custom_item_tax_for_unit
+            row.custom_amount_after_tax = row.custom_rate_after_tax * row.qty
 
 def apply_pricing_rule_on_items(self, item, pricing_rule_args):
     if not item.get('price_list_rate'):
