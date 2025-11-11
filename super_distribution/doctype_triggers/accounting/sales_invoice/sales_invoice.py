@@ -386,7 +386,7 @@ def apply_pricing_rule_on_items(self, item, pricing_rule_args):
         for pricing_rule in get_applied_pricing_rules(item.get("pricing_rules")):
             pricing_rule_doc = frappe.get_cached_doc("Pricing Rule", pricing_rule)
             for field in ["discount_percentage", "discount_amount", "rate"]:
-                if item.get(field) < pricing_rule_doc.get(field):
+                if (item.get(field, 0) or 0) < (pricing_rule_doc.get(field, 0) or 0):
                     title = frappe.get_link_to_form("Pricing Rule", pricing_rule)
                     frappe.msgprint(
                         _("Row {0}: user has not applied the rule {1} on the item {2}").format(
